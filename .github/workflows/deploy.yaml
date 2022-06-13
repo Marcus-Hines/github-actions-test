@@ -58,32 +58,7 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      # Builds and pushes an image up to your Azure Container Registry
-      - name: Build and push image to ACR
-        run: |
-          az acr build --image ${{ env.CONTAINER_NAME }}:${{ github.sha }} --registry ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.RESOURCE_GROUP }} ./azure-vote
-
-      # Retrieves your Azure Kubernetes Service cluster's kubeconfig file
-      - name: Get K8s context
-        uses: azure/aks-set-context@v2.0
-        with:
-          resource-group: ${{ env.RESOURCE_GROUP }}
-          cluster-name: ${{ env.CLUSTER_NAME }}
-
-      # Retrieves the credentials for pulling images from your Azure Container Registry
-      - name: Get ACR credentials
-        run: |
-          az acr update -n ${{ env.AZURE_CONTAINER_REGISTRY }} -g ${{ env.RESOURCE_GROUP }} --admin-enabled true
-          ACR_USERNAME=$(az acr credential show -g ${{ env.RESOURCE_GROUP }} -n ${{ env.AZURE_CONTAINER_REGISTRY }} --query username -o tsv)
-          ACR_PASSWORD=$(az acr credential show -g ${{ env.RESOURCE_GROUP }} -n ${{ env.AZURE_CONTAINER_REGISTRY }} --query passwords[0].value -o tsv)
-          echo "::add-mask::${ACR_USERNAME}"
-          echo "::set-output name=username::${ACR_USERNAME}"
-          echo "::add-mask::${ACR_PASSWORD}"
-          echo "::set-output name=password::${ACR_PASSWORD}"
-        id: get-acr-creds
-
       # Creates a kubernetes secret on your Azure Kubernetes Service cluster that matches up to the credentials from the last step
       - name: Create K8s secret for pulling image from ACR
         run: |
-          az aks command invoke --resource-group mahinesrg --name myPrivateCluster --command "kubectl create secret docker-registry image-pull-secret-name --docker-username ${{ steps.get-acr-creds.outputs.username }} --docker-password ${{ steps.get-acr-creds.outputs.password }} --docker-server ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io --docker-email" 
           az aks command invoke --resource-group mahinesrg --name myPrivateCluster --insecure-skip-tls-verify --namespace default --command "kubectl cluster-info"
