@@ -124,7 +124,7 @@ env:
   AZURE_CONTAINER_REGISTRY: "marcusacr"
   CONTAINER_NAME: "azure-voting-app"
   RESOURCE_GROUP: "mahinesrg"
-  CLUSTER_NAME: "myPrivateClusterBro"
+  CLUSTER_NAME: "myPrivateCluster"
   IMAGE_PULL_SECRET_NAME: "image-pull-secret-name"
 
 jobs:
