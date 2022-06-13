@@ -61,4 +61,4 @@ jobs:
       # Creates a kubernetes secret on your Azure Kubernetes Service cluster that matches up to the credentials from the last step
       - name: Create K8s secret for pulling image from ACR
         run: |
-          az aks command invoke --resource-group mahinesrg --name myPrivateCluster --insecure-skip-tls-verify --namespace default --command "kubectl cluster-info"
+          az aks command invoke --resource-group mahinesrg --name myPrivateCluster --namespace default --command "kubectl cluster-info"
